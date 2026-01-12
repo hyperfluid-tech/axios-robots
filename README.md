@@ -1,7 +1,7 @@
 # Axios Robots Exclusion Protocol 🤖
 
 [![npm version](https://img.shields.io/npm/v/axios-robots.svg)](https://www.npmjs.com/package/axios-robots)
-![Coverage](https://raw.githubusercontent.com/hyperfluid-tech/axios-robots/badges/coverage.svg)
+![Coverage](https://raw.githubusercontent.com/hyperfluid-tech/axios-robots/badges/badges/coverage.svg)
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%23007ACC.svg)](https://www.typescriptlang.org/)
 
