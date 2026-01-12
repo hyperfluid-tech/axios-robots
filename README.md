@@ -11,7 +11,7 @@ Ensures your bot plays by the rules defined by website owners, preventing unauth
 ## Features
 
 - **🚀 Automated Compliance**: Validates every request against `robots.txt` rules (cached per origin).
-- **🛡️ Strict Mode**: invalid URLs, non-HTTP/S protocols, or unreachable `robots.txt` files (non-404) block requests by default.
+- **🛡️ Strict Mode**: invalid URLs, non-HTTP/S protocols, or unreachable `robots.txt` files (non-4xx error) block requests by default.
 - **✨ Clean Architecture**: built with maintainability and separation of concerns in mind.
 - **🔌 Plug-and-Play**: easily attaches to any Axios instance.
 - **📦 Lightweight**: minimal dependencies (`robots-parser`).
@@ -90,9 +90,9 @@ The interceptor throws a `RobotsError` in the following cases:
 1. **Blocked by Rules**: The URL is disallowed by `robots.txt` for your User-Agent.
 2. **Invalid URL**: The request URL cannot be parsed.
 3. **Invalid Protocol**: The protocol is not `http:` or `https:`.
-4. **Unreachable robots.txt**: The `robots.txt` file could not be fetched (and did not return 404).
+4. **Unreachable robots.txt**: The `robots.txt` file could not be fetched (and did not return a 4xx status).
 
-> **Note**: If `robots.txt` returns a **404 Not Found**, the library assumes **Allow All** (per standard protocol).
+**Note**: If `robots.txt` returns a **Client Error (4xx)** (e.g. 404 Not Found, 403 Forbidden), the library assumes **Allow All** (per RFC 9309).
 
 ## How It Works
 
@@ -118,8 +118,12 @@ The interceptor throws a `RobotsError` in the following cases:
 
 ## Contributing
 
-Contributions are clear! Please follow the existing Clean Architecture pattern:
-- **`domain/`**: Core logic (fetching/parsing robots.txt).
+We love contributions! 🤝 Whether it's reporting a bug, suggesting a feature, or writing code, we'd love to have you involved.
+
+Please feel free to submit a Pull Request. If you're looking for a place to start, check out the [Roadmap](#-missing--todo).
+
+When contributing, please try to follow the existing **Clean Architecture** pattern:
+- **`domain/`**: Core logic (RobotsService, fetching/parsing robots.txt).
 - **`errors/`**: Custom error classes and messages.
 - **`interceptor.ts`**: Axios integration logic.
 - **`types.ts`**: Shared interfaces.
