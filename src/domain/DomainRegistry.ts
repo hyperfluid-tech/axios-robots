@@ -20,36 +20,31 @@ export class DomainRegistry {
             this.cache.set(origin, robot);
         }
 
-        // robots-parser's isAllowed returns boolean | undefined. Undefined usually means no rule, so allow.
-        // However, the library signatures says it returns boolean usually.
-        // We strictly check for explicitly disallowed.
         return robot.isAllowed(url, userAgent) ?? true;
     }
 
     private async fetchRobotsTxt(origin: string, userAgent: string): Promise<Robot> {
         const robotsUrl = `${origin}/${ROBOTS_TXT_FILENAME}`;
-        // Use a fresh axios instance to avoid triggering our own interceptor recursively
-        // if the user attached it to the global axios instance.
+
         const internalClient = axios.create({
             headers: {
                 [HEADER_USER_AGENT]: userAgent,
             }
         });
+
         try {
             const response = await internalClient.get(robotsUrl);
             return robotsParser(robotsUrl, response.data);
         } catch (error: any) {
-            // Per RFC 9309 2.3.1.3: "Unavailable" Status (400-499)
-            // "If a server status code indicates that the robots.txt file is unavailable... 
-            // then the crawler MAY access any resources on the server."
-            if (error.response && error.response.status >= 400 && error.response.status < 500) {
-                // Create a robot that allows everything
+            if (this.isUnavailable(error)) {
                 return robotsParser(robotsUrl, ALLOW_ALL_ROBOTS_TXT_CONTENT);
             }
 
-            // For other errors (500, network, etc), we rethrow to prevent access
-            // as we cannot determine if we are allowed or not.
             throw new RobotsError(ERROR_MESSAGES.ROBOTS_UNREACHABLE(error.message));
         }
+    }
+
+    private isUnavailable(error: any): boolean {
+        return error.response && error.response.status >= 400 && error.response.status < 500;
     }
 }
