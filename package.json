@@ -25,6 +25,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "test:coverage": "jest --coverage && node scripts/make-badge.js",
     "prepublishOnly": "npm run build"
   },
   "type": "commonjs",

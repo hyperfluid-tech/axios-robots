@@ -1,0 +1,58 @@
+name: Test Coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm run test -- --coverage
+
+      - name: Generate Badge
+        run: node scripts/make-badge.js
+
+      - name: Deploy Badge
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Create temporary directory for the badge
+          mkdir -p /tmp/badge-deploy
+          cp badges/coverage.svg /tmp/badge-deploy/coverage.svg
+          
+          # Switch to orphan branch (create if doesn't exist)
+          git checkout --orphan badges || git checkout badges
+          
+          # Remove all existing files from index
+          git rm -rf .
+          
+          # Restore the badge
+          mkdir -p badges
+          cp /tmp/badge-deploy/coverage.svg badges/coverage.svg
+          
+          # Add and commit
+          git add badges/coverage.svg
+          git commit -m "Update coverage badge" || echo "No changes to badge"
+          
+          # Push
+          git push origin badges --force

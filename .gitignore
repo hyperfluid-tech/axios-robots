@@ -39,8 +39,10 @@ scripts/eslint/built/
 scripts/debug.bat
 scripts/run.bat
 scripts/**/*.js
+!scripts/make-badge.js
 scripts/**/*.js.map
 coverage/
+badges/
 internal/
 **/.DS_Store
 .settings
