@@ -4,7 +4,9 @@ import { HEADER_USER_AGENT, ROBOTS_TXT_FILENAME, ALLOW_ALL_ROBOTS_TXT_CONTENT } 
 import { RobotsError } from '../errors/RobotsError';
 import { ERROR_MESSAGES } from '../errors/messages';
 
-export class DomainRegistry {
+import { IRobotsService } from '../types';
+
+export class RobotsService implements IRobotsService {
     private cache: Map<string, Robot> = new Map();
 
     /**

@@ -1,16 +1,16 @@
 import { InternalAxiosRequestConfig } from 'axios';
-import { DomainRegistry } from './domain/DomainRegistry';
+import { IRobotsService, RobotsPluginOptions } from './types';
+import { RobotsService } from './domain/RobotsService';
 import { RobotsError } from './errors/RobotsError';
 import { HEADER_USER_AGENT, PROTOCOL_HTTP, PROTOCOL_HTTPS } from './constants';
 import { ERROR_MESSAGES } from './errors/messages';
-import { RobotsPluginOptions } from './types';
 
 export class RobotsInterceptor {
-  private registry: DomainRegistry;
+  private robotsService: IRobotsService;
   private userAgent: string;
 
-  constructor(options: RobotsPluginOptions) {
-    this.registry = new DomainRegistry();
+  constructor(options: RobotsPluginOptions, robotsService?: IRobotsService) {
+    this.robotsService = robotsService || new RobotsService();
     this.userAgent = options.userAgent;
   }
 
@@ -25,7 +25,7 @@ export class RobotsInterceptor {
     const url = this.resolveUrl(config);
     this.validateProtocol(url);
 
-    const isAllowed = await this.registry.isAllowed(url.toString(), this.userAgent);
+    const isAllowed = await this.robotsService.isAllowed(url.toString(), this.userAgent);
 
     if (!isAllowed) {
       throw new RobotsError(ERROR_MESSAGES.ROBOTS_DENIED(url.toString(), this.userAgent));

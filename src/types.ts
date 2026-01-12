@@ -7,3 +7,10 @@ export interface RobotsPluginOptions {
      */
     userAgent: string;
 }
+
+/**
+ * Interface for the Robots Service.
+ */
+export interface IRobotsService {
+    isAllowed(url: string, userAgent?: string): Promise<boolean>;
+}

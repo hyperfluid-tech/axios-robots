@@ -2,7 +2,7 @@ import { AxiosInstance } from 'axios';
 import { RobotsInterceptor } from './interceptor';
 import { RobotsPluginOptions } from './types';
 
-export * from './domain/DomainRegistry';
+export * from './domain/RobotsService';
 export * from './errors/RobotsError';
 export * from './interceptor';
 export * from './types';
