@@ -1,0 +1,28 @@
+{
+  "name": "axios-robots",
+  "version": "1.0.0",
+  "description": "A lightweight Axios interceptor that enforces robots.txt compliance for web scrapers and bots",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperfluid-tech/axios-robots.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/hyperfluid-tech/axios-robots/issues"
+  },
+  "homepage": "https://github.com/hyperfluid-tech/axios-robots#readme",
+  "devDependencies": {
+    "@types/node": "^25.0.6",
+    "axios": "^1.13.2",
+    "robots-parser": "^3.0.1",
+    "typescript": "^5.9.3"
+  }
+}
