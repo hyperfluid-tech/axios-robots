@@ -37,8 +37,10 @@ export class DomainRegistry {
       const response = await internalClient.get(robotsUrl);
       return robotsParser(robotsUrl, response.data);
     } catch (error: any) {
-      // Per standard, if robots.txt is 404, allow everything.
-      if (error.response && error.response.status === 404) {
+        // Per RFC 9309 2.3.1.3: "Unavailable" Status (400-499)
+        // "If a server status code indicates that the robots.txt file is unavailable... 
+        // then the crawler MAY access any resources on the server."
+        if (error.response && error.response.status >= 400 && error.response.status < 500) {
         // Create a robot that allows everything
         return robotsParser(robotsUrl, ALLOW_ALL_ROBOTS_TXT_CONTENT);
       }
