@@ -1,3 +1,3 @@
 export interface RobotsPluginOptions {
-  userAgent: string;
+    userAgent: string;
 }

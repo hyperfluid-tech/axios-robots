@@ -24,7 +24,7 @@ export class RobotsInterceptor {
 
     // Resolve full URL if relative
     let fullUrlObject: URL;
-    
+
     try {
       if (config.url && (config.url.startsWith(PROTOCOL_HTTP) || config.url.startsWith(PROTOCOL_HTTPS))) {
         fullUrlObject = new URL(config.url);
@@ -33,7 +33,7 @@ export class RobotsInterceptor {
       } else {
         // If no baseURL and url is not absolute http/s, try to parse it as absolute (e.g. might be just hostname)
         // or fail if relative
-         fullUrlObject = new URL(config.url || '');
+        fullUrlObject = new URL(config.url || '');
       }
 
 
@@ -43,7 +43,7 @@ export class RobotsInterceptor {
     }
 
     if (fullUrlObject.protocol !== PROTOCOL_HTTP && fullUrlObject.protocol !== PROTOCOL_HTTPS) {
-       throw new RobotsError(ERROR_MESSAGES.INVALID_PROTOCOL(fullUrlObject.protocol));
+      throw new RobotsError(ERROR_MESSAGES.INVALID_PROTOCOL(fullUrlObject.protocol));
     }
 
     const fullUrl = fullUrlObject.toString();
@@ -60,8 +60,8 @@ export class RobotsInterceptor {
     // The previous code snippet did: 'User-Agent': config.headers.userAgent
     // We should probably ensure the request has the UA we checked against.
     if (config.headers) {
-        config.headers.set(HEADER_USER_AGENT, this.userAgent);
-    } 
+      config.headers.set(HEADER_USER_AGENT, this.userAgent);
+    }
 
     return config;
   }
