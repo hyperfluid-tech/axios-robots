@@ -3,12 +3,27 @@ import { Robot } from 'robots-parser';
 /**
  * Options for the Robots Exclusion Protocol plugin.
  */
+export enum CrawlDelayComplianceMode {
+    /**
+     * Respects the Crawl-delay directive by waiting before making the request.
+     */
+    Await = 'await',
+    /**
+     * Ignores the Crawl-delay directive.
+     */
+    Ignore = 'ignore'
+}
+
 export interface RobotsPluginOptions {
     /**
      * The User-Agent string to use when checking robots.txt rules.
      */
     userAgent: string;
-    complyWithCrawlDelay?: boolean;
+    /**
+     * How to handle Crawl-delay directives.
+     * Defaults to CrawlDelayComplianceMode.Await
+     */
+    crawlDelayCompliance?: CrawlDelayComplianceMode;
 }
 
 export interface CachedRobot {

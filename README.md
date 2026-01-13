@@ -45,7 +45,6 @@ const client = axios.create();
 // Apply the interceptor
 applyRobotsInterceptor(client, { 
     userAgent: 'MyCoolBot/1.0',
-    complyWithCrawlDelay: true // default is true
 });
 
 async function crawl() {
@@ -83,7 +82,12 @@ Attaches the interceptor to the provided Axios instance.
 ```typescript
 interface RobotsPluginOptions {
   userAgent: string;
-  complyWithCrawlDelay?: boolean; // default: true
+  crawlDelayCompliance?: CrawlDelayComplianceMode; // default: CrawlDelayComplianceMode.Await
+}
+
+enum CrawlDelayComplianceMode {
+  Await = 'await',   // Respects delay by waiting
+  Ignore = 'ignore'  // Ignores delay
 }
 ```
 
@@ -114,9 +118,9 @@ The interceptor throws a `RobotsError` in the following cases:
 - [x] **[RFC 9309](https://www.rfc-editor.org/rfc/rfc9309.html) Compliance**: Full support for the standard Robots Exclusion Protocol.
 - [x] **Standard Directives**: Supports `User-agent`, `Allow`, and `Disallow`.
 - [x] **Wildcards**: Supports standard path matching including `*` and `$`.
+- [x] **Crawl-delay**: The interceptor enforces `Crawl-delay` directives (automatic throttling) if configured.
 
 ### 🚧 Missing / TODO
-- [x] **Crawl-delay**: The interceptor enforces `Crawl-delay` directives (automatic throttling) if configured.
 - [ ] **Sitemap**: Does not currently expose or parse `Sitemap` directives for the consumer.
 - [ ] **Cache TTL**: Caching is currently indefinite for the lifecycle of the Axios instance.
 
