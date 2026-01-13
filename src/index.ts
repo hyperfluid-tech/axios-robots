@@ -15,4 +15,8 @@ export * from './types';
 export function applyRobotsInterceptor(axiosInstance: AxiosInstance, options: RobotsPluginOptions): void {
   const interceptor = new RobotsInterceptor(options);
   axiosInstance.interceptors.request.use((config) => interceptor.intercept(config));
+  axiosInstance.interceptors.response.use(
+    (response) => interceptor.interceptResponse(response),
+    (error) => interceptor.interceptResponseError(error)
+  );
 }

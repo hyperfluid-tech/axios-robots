@@ -12,6 +12,7 @@ Ensures your bot plays by the rules defined by website owners, preventing unauth
 ## Features
 
 - **🚀 Automated Compliance**: Validates every request against `robots.txt` rules (cached per origin).
+- **⏱️ Crawl-Delay**: Option to automatically wait before requests if `Crawl-delay` is specified.
 - **🛡️ Strict Mode**: invalid URLs, non-HTTP/S protocols, or unreachable `robots.txt` files (non-4xx error) block requests by default.
 - **✨ Clean Architecture**: built with maintainability and separation of concerns in mind.
 - **🔌 Plug-and-Play**: easily attaches to any Axios instance.
@@ -43,7 +44,8 @@ const client = axios.create();
 
 // Apply the interceptor
 applyRobotsInterceptor(client, { 
-    userAgent: 'MyCoolBot/1.0' 
+    userAgent: 'MyCoolBot/1.0',
+    complyWithCrawlDelay: true // default is true
 });
 
 async function crawl() {
@@ -81,6 +83,7 @@ Attaches the interceptor to the provided Axios instance.
 ```typescript
 interface RobotsPluginOptions {
   userAgent: string;
+  complyWithCrawlDelay?: boolean; // default: true
 }
 ```
 
@@ -113,7 +116,7 @@ The interceptor throws a `RobotsError` in the following cases:
 - [x] **Wildcards**: Supports standard path matching including `*` and `$`.
 
 ### 🚧 Missing / TODO
-- [ ] **Crawl-delay**: The interceptor currently does **not** enforce `Crawl-delay` directives (automatic throttling).
+- [x] **Crawl-delay**: The interceptor enforces `Crawl-delay` directives (automatic throttling) if configured.
 - [ ] **Sitemap**: Does not currently expose or parse `Sitemap` directives for the consumer.
 - [ ] **Cache TTL**: Caching is currently indefinite for the lifecycle of the Axios instance.
 
