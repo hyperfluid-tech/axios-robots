@@ -1,8 +1,7 @@
 import robotsParser, { Robot } from 'robots-parser';
 import axios from 'axios';
 import { HEADER_USER_AGENT, ROBOTS_TXT_FILENAME, ALLOW_ALL_ROBOTS_TXT_CONTENT } from '../constants';
-import { RobotsError } from '../errors/RobotsError';
-import { ERROR_MESSAGES } from '../errors/messages';
+import { RobotsUnreachableError } from '../errors/RobotsUnreachableError';
 
 import { IRobotsService, CachedRobot } from '../types';
 
@@ -70,7 +69,7 @@ export class RobotsService implements IRobotsService {
                 return robotsParser(robotsUrl, ALLOW_ALL_ROBOTS_TXT_CONTENT);
             }
 
-            throw new RobotsError(ERROR_MESSAGES.ROBOTS_UNREACHABLE(error.message));
+            throw new RobotsUnreachableError(error.message);
         }
     }
 

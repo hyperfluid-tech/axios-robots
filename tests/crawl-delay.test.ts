@@ -117,6 +117,28 @@ describe('Crawl-delay Compliance', () => {
         const end = Date.now();
 
         const duration = end - start;
-        expect(duration).toBeLessThan(1000); 
+        expect(duration).toBeLessThan(1000);
+    });
+
+    test('GIVEN crawlDelayCompliance is Failure WHEN making consecutive requests THEN the second request should throw', async () => {
+        applyRobotsInterceptor(client, {
+            userAgent: USER_AGENT,
+            crawlDelayCompliance: CrawlDelayComplianceMode.Failure
+        });
+
+        nock(DOMAIN)
+            .get('/robots.txt')
+            .reply(200, `
+                User-agent: *
+                Crawl-delay: 5
+                Allow: /
+            `);
+
+        nock(DOMAIN).get('/one').reply(200, 'One');
+        nock(DOMAIN).get('/two').reply(200, 'Two');
+
+        await client.get(`${DOMAIN}/one`);
+
+        await expect(client.get(`${DOMAIN}/two`)).rejects.toThrow('Crawl-delay of 5s has not been met');
     });
 });

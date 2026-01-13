@@ -11,7 +11,11 @@ export enum CrawlDelayComplianceMode {
     /**
      * Ignores the Crawl-delay directive.
      */
-    Ignore = 'ignore'
+    Ignore = 'ignore',
+    /**
+     * Throws an error if the request violates the Crawl-delay.
+     */
+    Failure = 'failure'
 }
 
 export interface RobotsPluginOptions {

@@ -87,7 +87,8 @@ interface RobotsPluginOptions {
 
 enum CrawlDelayComplianceMode {
   Await = 'await',   // Respects delay by waiting
-  Ignore = 'ignore'  // Ignores delay
+  Ignore = 'ignore', // Ignores delay
+  Failure = 'failure' // Throws Error if delay is not met
 }
 ```
 

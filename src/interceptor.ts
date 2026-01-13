@@ -1,9 +1,11 @@
 import { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { IRobotsService, RobotsPluginOptions, CrawlDelayComplianceMode } from './types';
 import { RobotsService } from './domain/RobotsService';
-import { RobotsError } from './errors/RobotsError';
+import { CrawlDelayError } from './errors/CrawlDelayError';
+import { InvalidUrlError } from './errors/InvalidUrlError';
+import { InvalidProtocolError } from './errors/InvalidProtocolError';
+import { RobotsDeniedError } from './errors/RobotsDeniedError';
 import { HEADER_USER_AGENT, PROTOCOL_HTTP, PROTOCOL_HTTPS } from './constants';
-import { ERROR_MESSAGES } from './errors/messages';
 
 export class RobotsInterceptor {
   private robotsService: IRobotsService;
@@ -30,10 +32,10 @@ export class RobotsInterceptor {
     const isAllowed = await this.robotsService.isAllowed(url.toString(), this.userAgent);
 
     if (!isAllowed) {
-      throw new RobotsError(ERROR_MESSAGES.ROBOTS_DENIED(url.toString(), this.userAgent));
+      throw new RobotsDeniedError(url.toString(), this.userAgent);
     }
 
-    if (this.crawlDelayCompliance === CrawlDelayComplianceMode.Await) {
+    if (this.crawlDelayCompliance !== CrawlDelayComplianceMode.Ignore) {
       await this.handleCrawlDelay(url.toString());
     }
 
@@ -96,6 +98,9 @@ export class RobotsInterceptor {
     if (waitTime <= 0)
       return;
 
+    if (this.crawlDelayCompliance === CrawlDelayComplianceMode.Failure) {
+      throw new CrawlDelayError(delay);
+    }
 
     await new Promise(resolve => setTimeout(resolve, waitTime));
   }
@@ -112,12 +117,12 @@ export class RobotsInterceptor {
 
       return new URL(config.url || '');
     } catch (e: any) {
-      throw new RobotsError(ERROR_MESSAGES.INVALID_URL(e.message));
+      throw new InvalidUrlError(e.message);
     }
   }
 
   private validateProtocol(url: URL): void {
     if (url.protocol === PROTOCOL_HTTP || url.protocol === PROTOCOL_HTTPS) return;
-    throw new RobotsError(ERROR_MESSAGES.INVALID_PROTOCOL(url.protocol));
+    throw new InvalidProtocolError(url.protocol);
   }
 }

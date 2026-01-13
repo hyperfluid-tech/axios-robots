@@ -3,7 +3,7 @@ import { RobotsInterceptor } from './interceptor';
 import { RobotsPluginOptions } from './types';
 
 export * from './domain/RobotsService';
-export * from './errors/RobotsError';
+export * from './errors';
 export * from './interceptor';
 export * from './types';
 
