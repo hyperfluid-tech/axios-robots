@@ -1,5 +1,5 @@
 
-import { IRobotsDataService } from '../../types';
+import { IRobotsDataService } from '../interfaces/IRobotsDataService';
 
 export class CalculateWaitTimeUseCase {
     constructor(private dataService: IRobotsDataService) { }

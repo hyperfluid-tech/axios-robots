@@ -1,7 +1,6 @@
 import axios from 'axios';
 import nock from 'nock';
-import { applyRobotsInterceptor } from '../src/index';
-import { CrawlDelayComplianceMode } from '../src/types';
+import { applyRobotsInterceptor, CrawlDelayComplianceMode } from '../src/index';
 
 describe('Crawl-delay Compliance', () => {
     let client: ReturnType<typeof axios.create>;

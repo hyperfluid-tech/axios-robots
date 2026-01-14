@@ -1,13 +1,18 @@
 import { AxiosInstance } from 'axios';
 import { RobotsInterceptor } from './interceptor';
-import { RobotsPluginOptions } from './types';
+import { RobotsPluginOptions } from './domain/models/RobotsPluginOptions';
 
-export * from './domain/services/RobotsDataService';
+export * from './data/services/RobotsDataService';
 export * from './domain/services/AllowService';
 export * from './domain/services/CrawlDelayService';
 export * from './errors';
 export * from './interceptor';
-export * from './types';
+export * from './domain/models/RobotsPluginOptions';
+export * from './domain/models/CrawlDelayComplianceMode';
+export * from './domain/models/CachedRobot';
+export * from './domain/interfaces/IRobotsDataService';
+export * from './domain/interfaces/IAllowService';
+export * from './domain/interfaces/ICrawlDelayService';
 
 /**
  * Apply the robots exclusion protocol interceptor to an Axios instance.

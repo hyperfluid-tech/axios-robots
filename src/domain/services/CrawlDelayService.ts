@@ -1,4 +1,6 @@
-import { CrawlDelayComplianceMode, ICrawlDelayService, IRobotsDataService } from '../../types';
+import { CrawlDelayComplianceMode } from '../models/CrawlDelayComplianceMode';
+import { ICrawlDelayService } from '../interfaces/ICrawlDelayService';
+import { IRobotsDataService } from '../interfaces/IRobotsDataService';
 import { CalculateWaitTimeUseCase } from '../usecases/CalculateWaitTimeUseCase';
 import { CrawlDelayStrategyFactory } from '../strategies/CrawlDelayStrategyFactory';
 

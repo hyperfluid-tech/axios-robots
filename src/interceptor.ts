@@ -1,6 +1,10 @@
 import { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import { RobotsPluginOptions, CrawlDelayComplianceMode, IRobotsDataService, IAllowService, ICrawlDelayService } from './types';
-import { RobotsDataService } from './domain/services/RobotsDataService';
+import { RobotsPluginOptions } from './domain/models/RobotsPluginOptions';
+import { CrawlDelayComplianceMode } from './domain/models/CrawlDelayComplianceMode';
+import { IRobotsDataService } from './domain/interfaces/IRobotsDataService';
+import { IAllowService } from './domain/interfaces/IAllowService';
+import { ICrawlDelayService } from './domain/interfaces/ICrawlDelayService';
+import { RobotsDataService } from './data/services/RobotsDataService';
 import { AllowService } from './domain/services/AllowService';
 import { CrawlDelayService } from './domain/services/CrawlDelayService';
 import { InvalidUrlError } from './errors/InvalidUrlError';
