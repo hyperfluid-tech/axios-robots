@@ -2,9 +2,9 @@ import { AxiosInstance } from 'axios';
 import { RobotsInterceptor } from './interceptor';
 import { RobotsPluginOptions } from './types';
 
-export * from './domain/RobotsDataService';
-export * from './domain/AllowService';
-export * from './domain/CrawlDelayService';
+export * from './domain/services/RobotsDataService';
+export * from './domain/services/AllowService';
+export * from './domain/services/CrawlDelayService';
 export * from './errors';
 export * from './interceptor';
 export * from './types';

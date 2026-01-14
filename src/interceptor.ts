@@ -1,8 +1,8 @@
 import { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { RobotsPluginOptions, CrawlDelayComplianceMode, IRobotsDataService, IAllowService, ICrawlDelayService } from './types';
-import { RobotsDataService } from './domain/RobotsDataService';
-import { AllowService } from './domain/AllowService';
-import { CrawlDelayService } from './domain/CrawlDelayService';
+import { RobotsDataService } from './domain/services/RobotsDataService';
+import { AllowService } from './domain/services/AllowService';
+import { CrawlDelayService } from './domain/services/CrawlDelayService';
 import { InvalidUrlError } from './errors/InvalidUrlError';
 import { InvalidProtocolError } from './errors/InvalidProtocolError';
 import { RobotsDeniedError } from './errors/RobotsDeniedError';
