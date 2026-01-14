@@ -8,10 +8,6 @@ import { CachedRobot } from '../../domain/models/CachedRobot';
 export class RobotsDataService implements IRobotsDataService {
     private cache: Map<string, CachedRobot> = new Map();
 
-    /**
-     * Retrieves the cached robot rules for the given URL's origin.
-     * Fetches from the network if not already cached.
-     */
     async getRobot(url: string, userAgent: string = '*'): Promise<CachedRobot> {
         const origin = new URL(url).origin;
         let cached = this.cache.get(origin);
@@ -26,9 +22,6 @@ export class RobotsDataService implements IRobotsDataService {
         return cached;
     }
 
-    /**
-     * Updates the last crawled timestamp for the given URL's origin.
-     */
     setLastCrawled(url: string, timestamp: number): void {
         const origin = new URL(url).origin;
         const cached = this.cache.get(origin);

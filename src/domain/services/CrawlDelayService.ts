@@ -13,10 +13,6 @@ export class CrawlDelayService implements ICrawlDelayService {
         this.strategyFactory = new CrawlDelayStrategyFactory(this.calculateWaitTimeUseCase);
     }
 
-    /**
-     * Handles the crawl delay for the given URL and user agent.
-     * Enforces the delay based on the compliance mode.
-     */
     async handleCrawlDelay(
         url: string, 
         userAgent: string, 
