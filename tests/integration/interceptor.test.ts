@@ -1,8 +1,8 @@
 import axios from 'axios';
 import nock from 'nock';
-import { applyRobotsInterceptor } from '../src/index';
-import { RobotsError } from '../src/errors/RobotsError';
-import { HEADER_USER_AGENT } from '../src/constants';
+import { applyRobotsInterceptor } from '../../src/index';
+import { RobotsError } from '../../src/errors/RobotsError';
+import { HEADER_USER_AGENT } from '../../src/constants';
 
 describe('Axios Robots Interceptor', () => {
     let client: ReturnType<typeof axios.create>;
@@ -16,7 +16,11 @@ describe('Axios Robots Interceptor', () => {
     });
 
     describe('RFC Compliance: Access Rules', () => {
-        test('GIVEN a robots.txt with a specific Disallow rule WHEN the bot requests a matching path THEN it should throw a RobotsError', async () => {
+        test(`
+GIVEN a robots.txt with a specific Disallow rule
+WHEN the bot requests a matching path
+THEN it should throw a RobotsError
+        `, async () => {
 
             nock(DOMAIN)
                 .get('/robots.txt')
@@ -29,7 +33,11 @@ describe('Axios Robots Interceptor', () => {
             await expect(client.get(`${DOMAIN}/private`)).rejects.toThrow(RobotsError);
         });
 
-        test('GIVEN a robots.txt with a specific Allow rule WHEN the bot requests a matching path THEN it should allow the request', async () => {
+        test(`
+GIVEN a robots.txt with a specific Allow rule
+WHEN the bot requests a matching path
+THEN it should allow the request
+        `, async () => {
 
             nock(DOMAIN)
                 .get('/robots.txt')
@@ -45,7 +53,11 @@ describe('Axios Robots Interceptor', () => {
             expect(response.data).toBe('Public Data');
         });
 
-        test('GIVEN a robots.txt with a wildcard Disallow rule WHEN the bot requests a matching file THEN it should throw a RobotsError', async () => {
+        test(`
+GIVEN a robots.txt with a wildcard Disallow rule
+WHEN the bot requests a matching file
+THEN it should throw a RobotsError
+        `, async () => {
 
             nock(DOMAIN)
                 .get('/robots.txt')
@@ -56,7 +68,11 @@ describe('Axios Robots Interceptor', () => {
     });
 
     describe('RFC Compliance: User-Agent Matching', () => {
-        test('GIVEN a robots.txt with specific rules for TestBot WHEN TestBot requests a URL THEN it should follow the specific rules', async () => {
+        test(`
+GIVEN a robots.txt with specific rules for TestBot
+WHEN TestBot requests a URL
+THEN it should follow the specific rules
+        `, async () => {
 
             nock(DOMAIN)
                 .get('/robots.txt')
@@ -76,7 +92,11 @@ describe('Axios Robots Interceptor', () => {
     });
 
     describe('RFC Compliance: Status Codes (Availability)', () => {
-        test('GIVEN the robots.txt endpoint returns 404 (Not Found) WHEN a request is made THEN it should allow access', async () => {
+        test(`
+GIVEN the robots.txt endpoint returns 404 (Not Found)
+WHEN a request is made
+THEN it should allow access
+        `, async () => {
 
             nock(DOMAIN)
                 .get('/robots.txt')
@@ -91,7 +111,11 @@ describe('Axios Robots Interceptor', () => {
             expect(response.status).toBe(200);
         });
 
-        test('GIVEN the robots.txt endpoint returns 403 (Forbidden) WHEN a request is made THEN it should allow access (Unavailable = Allow)', async () => {
+        test(`
+GIVEN the robots.txt endpoint returns 403 (Forbidden)
+WHEN a request is made
+THEN it should allow access (Unavailable = Allow)
+        `, async () => {
 
             nock(DOMAIN)
                 .get('/robots.txt')
@@ -106,7 +130,11 @@ describe('Axios Robots Interceptor', () => {
             expect(response.status).toBe(200);
         });
 
-        test('GIVEN the robots.txt endpoint returns 500 (Internal Server Error) WHEN a request is made THEN it should throw a RobotsError (Unreachable = Disallow)', async () => {
+        test(`
+GIVEN the robots.txt endpoint returns 500 (Internal Server Error)
+WHEN a request is made
+THEN it should throw a RobotsError (Unreachable = Disallow)
+        `, async () => {
 
             nock(DOMAIN)
                 .get('/robots.txt')
@@ -117,17 +145,29 @@ describe('Axios Robots Interceptor', () => {
     });
 
     describe('Interceptor Logic & Safety', () => {
-        test('GIVEN an invalid URL WHEN a request is made THEN it should throw a RobotsError', async () => {
+        test(`
+GIVEN an invalid URL
+WHEN a request is made
+THEN it should throw a RobotsError
+        `, async () => {
 
             await expect(client.get('not-a-url')).rejects.toThrow(/Invalid URL/);
         });
 
-        test('GIVEN a non-HTTP protocol WHEN a request is made THEN it should throw a RobotsError', async () => {
+        test(`
+GIVEN a non-HTTP protocol
+WHEN a request is made
+THEN it should throw a RobotsError
+        `, async () => {
 
             await expect(client.get('ftp://example.com/file')).rejects.toThrow(/Invalid protocol/);
         });
 
-        test('GIVEN a valid config WHEN fetching robots.txt THEN it should send the configured User-Agent header', async () => {
+        test(`
+GIVEN a valid config
+WHEN fetching robots.txt
+THEN it should send the configured User-Agent header
+        `, async () => {
 
             nock(DOMAIN)
                 .get('/robots.txt')
@@ -145,7 +185,11 @@ describe('Axios Robots Interceptor', () => {
     });
 
     describe('Caching', () => {
-        test('GIVEN a cached robots.txt WHEN making a second request to the same origin THEN it should not make a second network request for robots.txt', async () => {
+        test(`
+GIVEN a cached robots.txt
+WHEN making a second request to the same origin
+THEN it should not make a second network request for robots.txt
+        `, async () => {
 
             const scope = nock(DOMAIN)
                 .get('/robots.txt')

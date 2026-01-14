@@ -1,6 +1,6 @@
 import axios from 'axios';
 import nock from 'nock';
-import { applyRobotsInterceptor, CrawlDelayComplianceMode } from '../src/index';
+import { applyRobotsInterceptor, CrawlDelayComplianceMode } from '../../src/index';
 
 describe('Crawl-delay Compliance', () => {
     let client: ReturnType<typeof axios.create>;
@@ -10,7 +10,6 @@ describe('Crawl-delay Compliance', () => {
     beforeEach(() => {
         nock.cleanAll();
         client = axios.create();
-        // Exclude nextTick and setImmediate to prevent hanging nock/axios promises
         jest.useFakeTimers({
             doNotFake: ['nextTick', 'setImmediate']
         });
@@ -24,7 +23,11 @@ describe('Crawl-delay Compliance', () => {
         [1, 1000],
         [2, 2000],
         [3, 3000]
-    ])('GIVEN a robots.txt with Crawl-delay: %i WHEN making consecutive requests THEN the second request should wait at least %i ms', async (delaySeconds, expectedDelayMs) => {
+    ])(`
+GIVEN a robots.txt with Crawl-delay: %i
+WHEN making consecutive requests
+THEN the second request should wait at least %i ms
+    `, async (delaySeconds, expectedDelayMs) => {
         applyRobotsInterceptor(client, {
             userAgent: USER_AGENT,
             crawlDelayCompliance: CrawlDelayComplianceMode.Await
@@ -46,7 +49,6 @@ describe('Crawl-delay Compliance', () => {
 
         const requestPromise = client.get(`${DOMAIN}/two`);
 
-        // Fast-forward time to simulate the delay
         jest.advanceTimersByTime(expectedDelayMs);
 
         await requestPromise;
@@ -56,7 +58,11 @@ describe('Crawl-delay Compliance', () => {
         expect(duration).toBeGreaterThanOrEqual(expectedDelayMs);
     });
 
-    test('GIVEN a request fails WHEN making a subsequent request THEN it should still respect the Crawl-delay', async () => {
+    test(`
+GIVEN a request fails
+WHEN making a subsequent request
+THEN it should still respect the Crawl-delay
+    `, async () => {
         applyRobotsInterceptor(client, {
             userAgent: USER_AGENT,
             crawlDelayCompliance: CrawlDelayComplianceMode.Await
@@ -73,17 +79,14 @@ describe('Crawl-delay Compliance', () => {
         nock(DOMAIN).get('/fail').reply(500, 'Server Error');
         nock(DOMAIN).get('/success').reply(200, 'Success');
 
-        // First request fails
         try {
             await client.get(`${DOMAIN}/fail`);
         } catch (e) {
-            // Expected error
         }
         const afterFail = Date.now();
 
         const requestPromise = client.get(`${DOMAIN}/success`);
 
-        // Fast-forward time to simulate the delay (2000ms)
         jest.advanceTimersByTime(2000);
 
         await requestPromise;
@@ -93,7 +96,11 @@ describe('Crawl-delay Compliance', () => {
         expect(duration).toBeGreaterThanOrEqual(2000);
     });
 
-    test('GIVEN crawlDelayCompliance is Ignore WHEN making consecutive requests THEN the second request should NOT wait', async () => {
+    test(`
+GIVEN crawlDelayCompliance is Ignore
+WHEN making consecutive requests
+THEN the second request should NOT wait
+    `, async () => {
         applyRobotsInterceptor(client, {
             userAgent: USER_AGENT,
             crawlDelayCompliance: CrawlDelayComplianceMode.Ignore
@@ -119,7 +126,11 @@ describe('Crawl-delay Compliance', () => {
         expect(duration).toBeLessThan(1000);
     });
 
-    test('GIVEN crawlDelayCompliance is Failure WHEN making consecutive requests THEN the second request should throw', async () => {
+    test(`
+GIVEN crawlDelayCompliance is Failure
+WHEN making consecutive requests
+THEN the second request should throw
+    `, async () => {
         applyRobotsInterceptor(client, {
             userAgent: USER_AGENT,
             crawlDelayCompliance: CrawlDelayComplianceMode.Failure
