@@ -1,21 +1,34 @@
 import { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import { IRobotsService, RobotsPluginOptions, CrawlDelayComplianceMode } from './types';
-import { RobotsService } from './domain/RobotsService';
-import { CrawlDelayError } from './errors/CrawlDelayError';
+import { RobotsPluginOptions, CrawlDelayComplianceMode, IRobotsDataService, IAllowService, ICrawlDelayService } from './types';
+import { RobotsDataService } from './domain/RobotsDataService';
+import { AllowService } from './domain/AllowService';
+import { CrawlDelayService } from './domain/CrawlDelayService';
 import { InvalidUrlError } from './errors/InvalidUrlError';
 import { InvalidProtocolError } from './errors/InvalidProtocolError';
 import { RobotsDeniedError } from './errors/RobotsDeniedError';
 import { HEADER_USER_AGENT, PROTOCOL_HTTP, PROTOCOL_HTTPS } from './constants';
 
 export class RobotsInterceptor {
-  private robotsService: IRobotsService;
+  private dataService: IRobotsDataService;
+  private allowService: IAllowService;
+  private crawlDelayService: ICrawlDelayService;
   private userAgent: string;
   private crawlDelayCompliance: CrawlDelayComplianceMode;
 
-  constructor(options: RobotsPluginOptions, robotsService?: IRobotsService) {
-    this.robotsService = robotsService || new RobotsService();
+  constructor(
+    options: RobotsPluginOptions,
+    deps?: {
+      dataService?: IRobotsDataService,
+      allowService?: IAllowService,
+      crawlDelayService?: ICrawlDelayService;
+    }
+  ) {
     this.userAgent = options.userAgent;
     this.crawlDelayCompliance = options.crawlDelayCompliance ?? CrawlDelayComplianceMode.Await;
+
+    this.dataService = deps?.dataService ?? new RobotsDataService();
+    this.allowService = deps?.allowService ?? new AllowService(this.dataService);
+    this.crawlDelayService = deps?.crawlDelayService ?? new CrawlDelayService(this.dataService);
   }
 
   /**
@@ -29,14 +42,14 @@ export class RobotsInterceptor {
     const url = this.resolveUrl(config);
     this.validateProtocol(url);
 
-    const isAllowed = await this.robotsService.isAllowed(url.toString(), this.userAgent);
+    const isAllowed = await this.allowService.isAllowed(url.toString(), this.userAgent);
 
     if (!isAllowed) {
       throw new RobotsDeniedError(url.toString(), this.userAgent);
     }
 
     if (this.crawlDelayCompliance !== CrawlDelayComplianceMode.Ignore) {
-      await this.handleCrawlDelay(url.toString());
+      await this.crawlDelayService.handleCrawlDelay(url.toString(), this.userAgent, this.crawlDelayCompliance);
     }
 
     if (config.headers) {
@@ -56,7 +69,7 @@ export class RobotsInterceptor {
 
     try {
       const fullUrl = this.resolveUrl(response.config as InternalAxiosRequestConfig).toString();
-      this.robotsService.setLastCrawled(fullUrl, Date.now());
+      this.dataService.setLastCrawled(fullUrl, Date.now());
     } catch (_) {
     }
 
@@ -74,35 +87,11 @@ export class RobotsInterceptor {
 
     try {
       const fullUrl = this.resolveUrl(error.config as InternalAxiosRequestConfig).toString();
-      this.robotsService.setLastCrawled(fullUrl, Date.now());
+      this.dataService.setLastCrawled(fullUrl, Date.now());
     } catch (_) {
     }
 
     return Promise.reject(error);
-  }
-
-  private async handleCrawlDelay(url: string): Promise<void> {
-    const cachedRobot = await this.robotsService.getRobot(url, this.userAgent);
-
-    if (!cachedRobot || !cachedRobot.robot)
-      return;
-
-
-    const delay = cachedRobot.robot.getCrawlDelay(this.userAgent);
-    if (!delay || delay <= 0 || !cachedRobot.lastCrawled)
-      return;
-
-
-    const timeSinceLastCrawl = Date.now() - cachedRobot.lastCrawled;
-    const waitTime = (delay * 1000) - timeSinceLastCrawl;
-    if (waitTime <= 0)
-      return;
-
-    if (this.crawlDelayCompliance === CrawlDelayComplianceMode.Failure) {
-      throw new CrawlDelayError(delay);
-    }
-
-    await new Promise(resolve => setTimeout(resolve, waitTime));
   }
 
   private resolveUrl(config: InternalAxiosRequestConfig): URL {

@@ -2,32 +2,16 @@ import robotsParser, { Robot } from 'robots-parser';
 import axios from 'axios';
 import { HEADER_USER_AGENT, ROBOTS_TXT_FILENAME, ALLOW_ALL_ROBOTS_TXT_CONTENT } from '../constants';
 import { RobotsUnreachableError } from '../errors/RobotsUnreachableError';
+import { IRobotsDataService, CachedRobot } from '../types';
 
-import { IRobotsService, CachedRobot } from '../types';
-
-export class RobotsService implements IRobotsService {
+export class RobotsDataService implements IRobotsDataService {
     private cache: Map<string, CachedRobot> = new Map();
-
-    /**
-     * Checks if the given URL is allowed for the specified User-Agent.
-     * Fetching and caching the robots.txt is handled automatically.
-     */
-    async isAllowed(url: string, userAgent: string = '*'): Promise<boolean> {
-        const robot = await this.getRobot(url, userAgent);
-
-        if (!robot) {
-            // Should not happen as getRobot handles fetching, but safety check
-            return true;
-        }
-
-        return robot.robot.isAllowed(url, userAgent) ?? true;
-    }
 
     /**
      * Retrieves the cached robot rules for the given URL's origin.
      * Fetches from the network if not already cached.
      */
-    async getRobot(url: string, userAgent: string = '*'): Promise<CachedRobot | undefined> {
+    async getRobot(url: string, userAgent: string = '*'): Promise<CachedRobot> {
         const origin = new URL(url).origin;
         let cached = this.cache.get(origin);
 

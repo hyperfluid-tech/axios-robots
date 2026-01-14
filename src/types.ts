@@ -35,11 +35,15 @@ export interface CachedRobot {
     lastCrawled?: number;
 }
 
-/**
- * Interface for the Robots Service.
- */
-export interface IRobotsService {
-    isAllowed(url: string, userAgent?: string): Promise<boolean>;
-    getRobot(url: string, userAgent?: string): Promise<CachedRobot | undefined>;
+export interface IRobotsDataService {
+    getRobot(url: string, userAgent?: string): Promise<CachedRobot>;
     setLastCrawled(url: string, timestamp: number): void;
+}
+
+export interface IAllowService {
+    isAllowed(url: string, userAgent?: string): Promise<boolean>;
+}
+
+export interface ICrawlDelayService {
+    handleCrawlDelay(url: string, userAgent: string, complianceMode: CrawlDelayComplianceMode): Promise<void>;
 }
