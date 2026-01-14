@@ -1,4 +1,4 @@
-import { IAllowService, IRobotsDataService } from '../types';
+import { IAllowService, IRobotsDataService } from '../../types';
 
 export class AllowService implements IAllowService {
     constructor(private dataService: IRobotsDataService) { }

@@ -1,8 +1,8 @@
 import robotsParser, { Robot } from 'robots-parser';
 import axios from 'axios';
-import { HEADER_USER_AGENT, ROBOTS_TXT_FILENAME, ALLOW_ALL_ROBOTS_TXT_CONTENT } from '../constants';
-import { RobotsUnreachableError } from '../errors/RobotsUnreachableError';
-import { IRobotsDataService, CachedRobot } from '../types';
+import { HEADER_USER_AGENT, ROBOTS_TXT_FILENAME, ALLOW_ALL_ROBOTS_TXT_CONTENT } from '../../constants';
+import { RobotsUnreachableError } from '../../errors/RobotsUnreachableError';
+import { IRobotsDataService, CachedRobot } from '../../types';
 
 export class RobotsDataService implements IRobotsDataService {
     private cache: Map<string, CachedRobot> = new Map();
