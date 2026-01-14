@@ -1,9 +1,9 @@
 import { CachedRobot } from '../models/CachedRobot';
 
 /**
- * Service for managing robots.txt data and crawl timestamps independently of the protocol logic.
+ * Repository for managing robots.txt data and crawl timestamps independently of the protocol logic.
  */
-export interface IRobotsDataService {
+export interface IRobotsDataRepository {
     /**
      * Retrieves the cached robot instance for a given URL.
      * @param url The URL to get the robot for (used to extract the domain/origin).

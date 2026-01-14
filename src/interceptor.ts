@@ -1,10 +1,10 @@
 import { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { RobotsPluginOptions } from './domain/models/RobotsPluginOptions';
 import { CrawlDelayComplianceMode } from './domain/models/CrawlDelayComplianceMode';
-import { IRobotsDataService } from './domain/interfaces/IRobotsDataService';
+import { IRobotsDataRepository } from './domain/interfaces/IRobotsDataRepository';
 import { IAllowService } from './domain/interfaces/IAllowService';
 import { ICrawlDelayService } from './domain/interfaces/ICrawlDelayService';
-import { RobotsDataService } from './data/services/RobotsDataService';
+import { RobotsDataRepository } from './data/repositories/RobotsDataRepository';
 import { AllowService } from './domain/services/AllowService';
 import { CrawlDelayService } from './domain/services/CrawlDelayService';
 import { InvalidUrlError } from './errors/InvalidUrlError';
@@ -13,7 +13,7 @@ import { RobotsDeniedError } from './errors/RobotsDeniedError';
 import { HEADER_USER_AGENT, PROTOCOL_HTTP, PROTOCOL_HTTPS } from './constants';
 
 export class RobotsInterceptor {
-  private dataService: IRobotsDataService;
+  private dataService: IRobotsDataRepository;
   private allowService: IAllowService;
   private crawlDelayService: ICrawlDelayService;
   private userAgent: string;
@@ -22,7 +22,7 @@ export class RobotsInterceptor {
   constructor(
     options: RobotsPluginOptions,
     deps?: {
-      dataService?: IRobotsDataService,
+      dataService?: IRobotsDataRepository,
       allowService?: IAllowService,
       crawlDelayService?: ICrawlDelayService;
     }
@@ -30,7 +30,7 @@ export class RobotsInterceptor {
     this.userAgent = options.userAgent;
     this.crawlDelayCompliance = options.crawlDelayCompliance ?? CrawlDelayComplianceMode.Await;
 
-    this.dataService = deps?.dataService ?? new RobotsDataService();
+    this.dataService = deps?.dataService ?? new RobotsDataRepository();
     this.allowService = deps?.allowService ?? new AllowService(this.dataService);
     this.crawlDelayService = deps?.crawlDelayService ?? new CrawlDelayService(this.dataService);
   }

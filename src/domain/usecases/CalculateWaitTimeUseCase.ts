@@ -1,8 +1,8 @@
 
-import { IRobotsDataService } from '../interfaces/IRobotsDataService';
+import { IRobotsDataRepository } from '../interfaces/IRobotsDataRepository';
 
 export class CalculateWaitTimeUseCase {
-    constructor(private dataService: IRobotsDataService) { }
+    constructor(private dataService: IRobotsDataRepository) { }
 
     async execute(url: string, userAgent: string): Promise<{ waitTime: number; delay: number; }> {
         const cachedRobot = await this.dataService.getRobot(url, userAgent);

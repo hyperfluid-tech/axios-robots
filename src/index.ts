@@ -2,7 +2,7 @@ import { AxiosInstance } from 'axios';
 import { RobotsInterceptor } from './interceptor';
 import { RobotsPluginOptions } from './domain/models/RobotsPluginOptions';
 
-export * from './data/services/RobotsDataService';
+export * from './data/repositories/RobotsDataRepository';
 export * from './domain/services/AllowService';
 export * from './domain/services/CrawlDelayService';
 export * from './errors';
@@ -10,7 +10,7 @@ export * from './interceptor';
 export * from './domain/models/RobotsPluginOptions';
 export * from './domain/models/CrawlDelayComplianceMode';
 export * from './domain/models/CachedRobot';
-export * from './domain/interfaces/IRobotsDataService';
+export * from './domain/interfaces/IRobotsDataRepository';
 export * from './domain/interfaces/IAllowService';
 export * from './domain/interfaces/ICrawlDelayService';
 

@@ -1,6 +1,6 @@
 import { CrawlDelayComplianceMode } from '../models/CrawlDelayComplianceMode';
 import { ICrawlDelayService } from '../interfaces/ICrawlDelayService';
-import { IRobotsDataService } from '../interfaces/IRobotsDataService';
+import { IRobotsDataRepository } from '../interfaces/IRobotsDataRepository';
 import { CalculateWaitTimeUseCase } from '../usecases/CalculateWaitTimeUseCase';
 import { CrawlDelayStrategyFactory } from '../strategies/CrawlDelayStrategyFactory';
 
@@ -8,7 +8,7 @@ export class CrawlDelayService implements ICrawlDelayService {
     private calculateWaitTimeUseCase: CalculateWaitTimeUseCase;
     private strategyFactory: CrawlDelayStrategyFactory;
 
-    constructor(private dataService: IRobotsDataService) {
+    constructor(private dataService: IRobotsDataRepository) {
         this.calculateWaitTimeUseCase = new CalculateWaitTimeUseCase(dataService);
         this.strategyFactory = new CrawlDelayStrategyFactory(this.calculateWaitTimeUseCase);
     }

@@ -1,8 +1,8 @@
 import { IAllowService } from '../interfaces/IAllowService';
-import { IRobotsDataService } from '../interfaces/IRobotsDataService';
+import { IRobotsDataRepository } from '../interfaces/IRobotsDataRepository';
 
 export class AllowService implements IAllowService {
-    constructor(private dataService: IRobotsDataService) { }
+    constructor(private dataService: IRobotsDataRepository) { }
 
     async isAllowed(url: string, userAgent: string = '*'): Promise<boolean> {
         const robot = await this.dataService.getRobot(url, userAgent);

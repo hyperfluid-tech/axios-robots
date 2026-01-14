@@ -2,10 +2,10 @@ import robotsParser, { Robot } from 'robots-parser';
 import axios from 'axios';
 import { HEADER_USER_AGENT, ROBOTS_TXT_FILENAME, ALLOW_ALL_ROBOTS_TXT_CONTENT } from '../../constants';
 import { RobotsUnreachableError } from '../../errors/RobotsUnreachableError';
-import { IRobotsDataService } from '../../domain/interfaces/IRobotsDataService';
+import { IRobotsDataRepository } from '../../domain/interfaces/IRobotsDataRepository';
 import { CachedRobot } from '../../domain/models/CachedRobot';
 
-export class RobotsDataService implements IRobotsDataService {
+export class RobotsDataRepository implements IRobotsDataRepository {
     private cache: Map<string, CachedRobot> = new Map();
 
     async getRobot(url: string, userAgent: string = '*'): Promise<CachedRobot> {
