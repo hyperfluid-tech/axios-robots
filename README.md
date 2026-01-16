@@ -121,21 +121,15 @@ The interceptor throws a `RobotsError` in the following cases:
 - [x] **Wildcards**: Supports standard path matching including `*` and `$`.
 - [x] **Crawl-delay**: The interceptor enforces `Crawl-delay` directives (automatic throttling) if configured.
 
-### 🚧 Missing / TODO
+### 🚧 Roadmap
 - [ ] **Sitemap**: Does not currently expose or parse `Sitemap` directives for the consumer.
 - [ ] **Cache TTL**: Caching is currently indefinite for the lifecycle of the Axios instance.
 
 ## Contributing
 
-We love contributions! 🤝 Whether it's reporting a bug, suggesting a feature, or writing code, we'd love to have you involved.
+We love contributions! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 
-Please feel free to submit a Pull Request. If you're looking for a place to start, check out the [Roadmap](#-missing--todo).
-
-When contributing, please try to follow the existing **Clean Architecture** pattern:
-- **`domain/`**: Core logic (RobotsService, fetching/parsing robots.txt).
-- **`errors/`**: Custom error classes and messages.
-- **`interceptor.ts`**: Axios integration logic.
-- **`types.ts`**: Shared interfaces.
+If you're looking for a place to start, check out the [Roadmap](#-roadmap).
 
 ## License
 
