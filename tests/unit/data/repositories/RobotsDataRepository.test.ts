@@ -3,6 +3,7 @@ import { RobotsPluginOptions } from '../../../../src/domain/models/RobotsPluginO
 import { CachingStrategyFactory } from '../../../../src/domain/strategies/caching/CachingStrategyFactory';
 import axios from 'axios';
 import robotsParser from 'robots-parser';
+import { HEADER_USER_AGENT } from '../../../../src/constants';
 
 jest.mock('axios');
 jest.mock('robots-parser');
@@ -128,6 +129,46 @@ describe('RobotsDataRepository', () => {
 
             expect(result).toBe(cached1);
             expect(mockStrategy.isValid).not.toHaveBeenCalled();
+        });
+
+        test(`
+        GIVEN no cached robot
+        WHEN incrementUsage is called
+        THEN it should do nothing
+        `, async () => {
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
+
+            repository.incrementUsage('https://unknown.com');
+
+            expect(repository.getCachedRobot('https://unknown.com')).toBeUndefined();
+        });
+
+        test(`
+        GIVEN no cached robot
+        WHEN setLastCrawled is called
+        THEN it should do nothing
+        `, async () => {
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
+
+            repository.setLastCrawled('https://unknown.com', Date.now());
+
+            expect(repository.getCachedRobot('https://unknown.com')).toBeUndefined();
+        });
+
+        test(`
+        GIVEN no userAgent provided
+        WHEN getRobot is called
+        THEN it should default to wildchar
+        `, async () => {
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
+
+            await repository.getRobot(origin);
+
+            expect(mockAxios.create).toHaveBeenCalledWith(expect.objectContaining({
+                headers: expect.objectContaining({
+                    [HEADER_USER_AGENT]: '*'
+                })
+            }));
         });
     });
 });
