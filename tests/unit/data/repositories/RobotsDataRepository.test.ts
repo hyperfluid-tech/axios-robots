@@ -34,7 +34,6 @@ describe('RobotsDataRepository', () => {
             getPreferredHost: jest.fn(),
         });
 
-        // Setup mock strategy
         mockStrategy = { isValid: jest.fn() };
         mockStrategyFactory.prototype.getStrategy = jest.fn().mockReturnValue(mockStrategy);
     });
@@ -46,14 +45,10 @@ describe('RobotsDataRepository', () => {
         THEN it should NOT fetch from network
         `, async () => {
             repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
-
-            // First call to populate cache
             await repository.getRobot(origin, userAgent);
 
-            // Setup validation to return true
             mockStrategy.isValid.mockReturnValue(true);
 
-            // Second call
             await repository.getRobot(origin, userAgent);
 
             expect(mockAxios.create).toHaveBeenCalledTimes(1);
@@ -66,14 +61,10 @@ describe('RobotsDataRepository', () => {
         THEN it should fetch from network again
         `, async () => {
             repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
-
-            // First call to populate cache
             await repository.getRobot(origin, userAgent);
 
-            // Setup validation to return false
             mockStrategy.isValid.mockReturnValue(false);
 
-            // Second call
             await repository.getRobot(origin, userAgent);
 
             expect(mockAxios.create).toHaveBeenCalledTimes(2);
@@ -81,59 +72,62 @@ describe('RobotsDataRepository', () => {
         });
 
         test(`
-        GIVEN ignoreCachePolicy option is true
-        WHEN robots.txt is requested
-        THEN it should NOT check strategy validity and return cached if available
-        `, async () => {
-            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
-
-            // First call to populate cache
-            await repository.getRobot(origin, userAgent);
-
-            // Clear strategy calls to verify it's NOT called
-            mockStrategy.isValid.mockClear();
-
-            // Second call with ignoreCachePolicy
-            await repository.getRobot(origin, userAgent, { ignoreCachePolicy: true });
-
-            expect(mockAxios.create).toHaveBeenCalledTimes(1);
-            expect(mockStrategy.isValid).not.toHaveBeenCalled();
-        });
-
-        test(`
-        GIVEN incrementUsage is true (default)
-        WHEN valid cached robot is returned
+        GIVEN valid cached robot
+        WHEN incrementUsage is called
         THEN usageCount should be incremented
         `, async () => {
             repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
 
-            // First call (usageCount = 1)
-            await repository.getRobot(origin, userAgent);
+            const cached1 = await repository.getRobot(origin, userAgent);
+            expect(cached1.usageCount).toBe(0);
+
+            repository.incrementUsage(origin);
+            expect(cached1.usageCount).toBe(1);
 
             mockStrategy.isValid.mockReturnValue(true);
 
-            // Second call (usageCount = 2)
-            const result = await repository.getRobot(origin, userAgent);
+            const cached2 = await repository.getRobot(origin, userAgent);
+            expect(cached2).toBe(cached1);
+            expect(cached2.usageCount).toBe(1);
 
-            expect(result.usageCount).toBe(2);
+            repository.incrementUsage(origin);
+            expect(cached2.usageCount).toBe(2);
         });
 
         test(`
-        GIVEN incrementUsage is false
-        WHEN valid cached robot is returned
-        THEN usageCount should NOT be incremented
+        GIVEN cached robot updates
+        WHEN cached robot is refreshed
+        THEN usageCount should reset to 0
         `, async () => {
             repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
 
-        // First call (usageCount = 1)
-            await repository.getRobot(origin, userAgent);
+            const cached1 = await repository.getRobot(origin, userAgent);
+            repository.incrementUsage(origin);
+            expect(cached1.usageCount).toBe(1);
 
-            mockStrategy.isValid.mockReturnValue(true);
+            mockStrategy.isValid.mockReturnValue(false);
 
-            // Second call (usageCount should remain 1)
-            const result = await repository.getRobot(origin, userAgent, { incrementUsage: false });
+            const cached2 = await repository.getRobot(origin, userAgent);
 
-            expect(result.usageCount).toBe(1);
+            expect(cached2).not.toBe(cached1);
+            expect(cached2.usageCount).toBe(0);
+        });
+
+        test(`
+        GIVEN cached robot exists
+        WHEN getCachedRobot is called
+        THEN it should return the cached robot without validation
+        `, async () => {
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
+
+            const cached1 = await repository.getRobot(origin, userAgent);
+
+            mockStrategy.isValid.mockReturnValue(false);
+
+            const result = repository.getCachedRobot(origin);
+
+            expect(result).toBe(cached1);
+            expect(mockStrategy.isValid).not.toHaveBeenCalled();
         });
     });
 });
