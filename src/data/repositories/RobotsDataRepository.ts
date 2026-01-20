@@ -4,19 +4,31 @@ import { HEADER_USER_AGENT, ROBOTS_TXT_FILENAME, ALLOW_ALL_ROBOTS_TXT_CONTENT } 
 import { RobotsUnreachableError } from '../../errors/RobotsUnreachableError';
 import { IRobotsDataRepository } from '../../domain/interfaces/IRobotsDataRepository';
 import { CachedRobot } from '../../domain/models/CachedRobot';
+import { RobotsPluginOptions } from '../../domain/models/RobotsPluginOptions';
+import { CachingPolicy } from '../../domain/models/CachingPolicy';
+import { CachingStrategyFactory } from '../../domain/strategies/CachingStrategyFactory';
+import { CachingPolicyType } from '../../domain/models/CachingPolicyType';
 
 export class RobotsDataRepository implements IRobotsDataRepository {
     private cache: Map<string, CachedRobot> = new Map();
+    private cachingPolicy: CachingPolicy;
+    private strategyFactory: CachingStrategyFactory;
+
+    constructor(options?: RobotsPluginOptions) {
+        this.cachingPolicy = options?.cachingPolicy ?? { type: CachingPolicyType.Indefinite };
+        this.strategyFactory = new CachingStrategyFactory();
+    }
 
     async getRobot(url: string, userAgent: string = '*'): Promise<CachedRobot> {
         const origin = new URL(url).origin;
         let cached = this.cache.get(origin);
 
-        if (cached)
+        if (cached && this.strategyFactory.getStrategy(this.cachingPolicy).isValid(cached)) {
             return cached;
+        }
 
         const robot = await this.fetchRobotsTxt(origin, userAgent);
-        cached = { robot };
+        cached = { robot, fetchedAt: Date.now() };
         this.cache.set(origin, cached);
 
         return cached;

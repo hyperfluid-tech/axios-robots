@@ -9,4 +9,8 @@ export interface CachedRobot {
      * Timestamp of the last crawl for this domain.
      */
     lastCrawled?: number;
+    /**
+     * Timestamp of when the robots.txt was fetched.
+     */
+    fetchedAt: number;
 }
