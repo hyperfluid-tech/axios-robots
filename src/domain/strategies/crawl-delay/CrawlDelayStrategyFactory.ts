@@ -1,7 +1,7 @@
 
-import { CrawlDelayComplianceMode } from '../models/CrawlDelayComplianceMode';
+import { CrawlDelayComplianceMode } from '../../models/CrawlDelayComplianceMode';
 import { ICrawlDelayStrategy } from './ICrawlDelayStrategy';
-import { CalculateWaitTimeUseCase } from '../usecases/CalculateWaitTimeUseCase';
+import { CalculateWaitTimeUseCase } from '../../usecases/CalculateWaitTimeUseCase';
 import { AwaitCrawlDelayStrategy } from './AwaitCrawlDelayStrategy';
 import { FailureCrawlDelayStrategy } from './FailureCrawlDelayStrategy';
 import { IgnoreCrawlDelayStrategy } from './IgnoreCrawlDelayStrategy';

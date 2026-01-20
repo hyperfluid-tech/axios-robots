@@ -30,7 +30,7 @@ export class RobotsInterceptor {
     this.userAgent = options.userAgent;
     this.crawlDelayCompliance = options.crawlDelayCompliance ?? CrawlDelayComplianceMode.Await;
 
-    this.dataService = deps?.dataService ?? new RobotsDataRepository();
+    this.dataService = deps?.dataService ?? new RobotsDataRepository(options);
     this.allowService = deps?.allowService ?? new AllowService(this.dataService);
     this.crawlDelayService = deps?.crawlDelayService ?? new CrawlDelayService(this.dataService);
   }

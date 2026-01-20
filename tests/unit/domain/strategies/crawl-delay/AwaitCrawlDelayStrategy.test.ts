@@ -1,5 +1,5 @@
-import { AwaitCrawlDelayStrategy } from '../../../../src/domain/strategies/AwaitCrawlDelayStrategy';
-import { CalculateWaitTimeUseCase } from '../../../../src/domain/usecases/CalculateWaitTimeUseCase';
+import { AwaitCrawlDelayStrategy } from "../../../../../src/domain/strategies/crawl-delay/AwaitCrawlDelayStrategy";
+import { CalculateWaitTimeUseCase } from "../../../../../src/domain/usecases/CalculateWaitTimeUseCase";
 
 describe('AwaitCrawlDelayStrategy', () => {
     let strategy: AwaitCrawlDelayStrategy;

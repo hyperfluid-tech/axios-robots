@@ -1,7 +1,7 @@
 
 import { ICrawlDelayStrategy } from './ICrawlDelayStrategy';
-import { CalculateWaitTimeUseCase } from '../usecases/CalculateWaitTimeUseCase';
-import { CrawlDelayError } from '../../errors/CrawlDelayError';
+import { CalculateWaitTimeUseCase } from '../../usecases/CalculateWaitTimeUseCase';
+import { CrawlDelayError } from '../../../errors/CrawlDelayError';
 
 export class FailureCrawlDelayStrategy implements ICrawlDelayStrategy {
     constructor(private calculateWaitTimeUseCase: CalculateWaitTimeUseCase) { }

@@ -1,6 +1,6 @@
-import { FailureCrawlDelayStrategy } from '../../../../src/domain/strategies/FailureCrawlDelayStrategy';
-import { CalculateWaitTimeUseCase } from '../../../../src/domain/usecases/CalculateWaitTimeUseCase';
-import { CrawlDelayError } from '../../../../src/errors/CrawlDelayError';
+import { FailureCrawlDelayStrategy } from '../../../../../src/domain/strategies/crawl-delay/FailureCrawlDelayStrategy';
+import { CalculateWaitTimeUseCase } from '../../../../../src/domain/usecases/CalculateWaitTimeUseCase';
+import { CrawlDelayError } from '../../../../../src/errors/CrawlDelayError';
 
 describe('FailureCrawlDelayStrategy', () => {
     let strategy: FailureCrawlDelayStrategy;

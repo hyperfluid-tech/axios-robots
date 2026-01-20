@@ -83,6 +83,7 @@ Attaches the interceptor to the provided Axios instance.
 interface RobotsPluginOptions {
   userAgent: string;
   crawlDelayCompliance?: CrawlDelayComplianceMode; // default: CrawlDelayComplianceMode.Await
+  cachingPolicy?: CachingPolicy; // default: Indefinite (caches forever)
 }
 
 enum CrawlDelayComplianceMode {
@@ -90,6 +91,25 @@ enum CrawlDelayComplianceMode {
   Ignore = 'ignore', // Ignores delay
   Failure = 'failure' // Throws Error if delay is not met
 }
+```
+
+### `CachingPolicy`
+
+You can configure how long `robots.txt` is cached.
+
+```typescript
+import { CachingPolicyType } from 'axios-robots';
+
+// Option 1: Indefinite Caching (Default)
+const indefinite = {
+    type: CachingPolicyType.Indefinite
+};
+
+// Option 2: Time-based Expiration
+const timeBased = {
+    type: CachingPolicyType.ExpireAfter,
+    duration: '1h' // Supports strings ('5m', '1d', '200ms') or numbers (milliseconds)
+};
 ```
 
 ### Error Handling
@@ -120,10 +140,10 @@ The interceptor throws a `RobotsError` in the following cases:
 - [x] **Standard Directives**: Supports `User-agent`, `Allow`, and `Disallow`.
 - [x] **Wildcards**: Supports standard path matching including `*` and `$`.
 - [x] **Crawl-delay**: The interceptor enforces `Crawl-delay` directives (automatic throttling) if configured.
+- [x] **Cache TTL**: Flexible caching policies (indefinite or expiration-based).
 
 ### 🚧 Roadmap
 - [ ] **Sitemap**: Does not currently expose or parse `Sitemap` directives for the consumer.
-- [ ] **Cache TTL**: Caching is currently indefinite for the lifecycle of the Axios instance.
 
 ## Contributing
 

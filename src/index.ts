@@ -14,6 +14,12 @@ export * from './domain/interfaces/IRobotsDataRepository';
 export * from './domain/interfaces/IAllowService';
 export * from './domain/interfaces/ICrawlDelayService';
 
+export * from './domain/models/CachingPolicy';
+export * from './domain/models/CachingPolicyType';
+export * from './domain/strategies/caching/ICachingStrategy';
+export * from './domain/strategies/caching/IndefiniteCachingStrategy';
+export * from './domain/strategies/caching/ExpireAfterCachingStrategy';
+export * from './domain/strategies/caching/CachingStrategyFactory';
 /**
  * Apply the robots exclusion protocol interceptor to an Axios instance.
  * @param axiosInstance The axios instance to apply the interceptor to

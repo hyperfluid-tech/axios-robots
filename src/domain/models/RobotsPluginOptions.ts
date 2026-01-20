@@ -1,4 +1,5 @@
 import { CrawlDelayComplianceMode } from './CrawlDelayComplianceMode';
+import { CachingPolicy } from './CachingPolicy';
 
 export interface RobotsPluginOptions {
     /**
@@ -10,4 +11,9 @@ export interface RobotsPluginOptions {
      * Defaults to CrawlDelayComplianceMode.Await
      */
     crawlDelayCompliance?: CrawlDelayComplianceMode;
+    /**
+     * How to handle caching of robots.txt data.
+     * Defaults to indefinitely.
+     */
+    cachingPolicy?: CachingPolicy;
 }

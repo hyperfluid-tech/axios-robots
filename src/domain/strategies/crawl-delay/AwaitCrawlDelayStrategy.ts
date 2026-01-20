@@ -1,6 +1,6 @@
 
 import { ICrawlDelayStrategy } from './ICrawlDelayStrategy';
-import { CalculateWaitTimeUseCase } from '../usecases/CalculateWaitTimeUseCase';
+import { CalculateWaitTimeUseCase } from '../../usecases/CalculateWaitTimeUseCase';
 
 export class AwaitCrawlDelayStrategy implements ICrawlDelayStrategy {
     constructor(private calculateWaitTimeUseCase: CalculateWaitTimeUseCase) { }
