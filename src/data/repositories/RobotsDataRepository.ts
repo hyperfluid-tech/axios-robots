@@ -19,16 +19,27 @@ export class RobotsDataRepository implements IRobotsDataRepository {
         this.strategyFactory = new CachingStrategyFactory();
     }
 
-    async getRobot(url: string, userAgent: string = '*'): Promise<CachedRobot> {
+    async getRobot(
+        url: string, 
+        userAgent: string = '*', 
+        options: { incrementUsage?: boolean; ignoreCachePolicy?: boolean } = {}
+    ): Promise<CachedRobot> {
+        const { incrementUsage = true, ignoreCachePolicy = false } = options;
         const origin = new URL(url).origin;
         let cached = this.cache.get(origin);
 
-        if (cached && this.strategyFactory.getStrategy(this.cachingPolicy).isValid(cached)) {
+        const strategy = this.strategyFactory.getStrategy(this.cachingPolicy);
+        const isValid = cached && (ignoreCachePolicy || strategy.isValid(cached));
+
+        if (isValid && cached) {
+            if (incrementUsage) {
+                cached.usageCount = (cached.usageCount || 0) + 1;
+            }
             return cached;
         }
 
         const robot = await this.fetchRobotsTxt(origin, userAgent);
-        cached = { robot, fetchedAt: Date.now() };
+        cached = { robot, fetchedAt: Date.now(), usageCount: 1 };
         this.cache.set(origin, cached);
 
         return cached;

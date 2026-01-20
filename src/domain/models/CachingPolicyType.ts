@@ -9,5 +9,9 @@ export enum CachingPolicyType {
     /**
      * Cache robots.txt data for a specific duration.
      */
-    ExpireAfter = 'expireAfter'
+    ExpireAfter = 'expireAfter',
+    /**
+     * Cache robots.txt data for a specific number of requests.
+     */
+    RequestCount = 'requestCount'
 }

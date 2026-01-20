@@ -5,7 +5,7 @@ export class CalculateWaitTimeUseCase {
     constructor(private dataService: IRobotsDataRepository) { }
 
     async execute(url: string, userAgent: string): Promise<{ waitTime: number; delay: number; }> {
-        const cachedRobot = await this.dataService.getRobot(url, userAgent);
+        const cachedRobot = await this.dataService.getRobot(url, userAgent, { incrementUsage: false, ignoreCachePolicy: true });
 
         if (!cachedRobot || !cachedRobot.robot) {
             return { waitTime: 0, delay: 0 };
