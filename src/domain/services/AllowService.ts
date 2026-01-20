@@ -6,6 +6,7 @@ export class AllowService implements IAllowService {
 
     async isAllowed(url: string, userAgent: string = '*'): Promise<boolean> {
         const robot = await this.dataService.getRobot(url, userAgent);
+        this.dataService.incrementUsage(url);
 
         if (!robot || !robot.robot) {
             return true;

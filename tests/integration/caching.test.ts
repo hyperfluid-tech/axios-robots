@@ -112,4 +112,67 @@ describe('Caching Policy Integration', () => {
 
         expect(robotsScope.isDone()).toBe(true);
     });
+    test(`
+    GIVEN a requestCount caching policy of 2 requests
+    WHEN a third request is made
+    THEN robots.txt should be fetched again
+    `, async () => {
+        const initialTime = 1672531200000;
+        jest.spyOn(Date, 'now').mockReturnValue(initialTime);
+
+        client = axios.create();
+        applyRobotsInterceptor(client, {
+            userAgent: USER_AGENT,
+            cachingPolicy: {
+                type: CachingPolicyType.RequestCount,
+                maxRequests: 2
+            }
+        });
+
+        const robotsScope = nock(DOMAIN)
+            .get('/robots.txt')
+            .times(2)
+            .reply(200, `User-agent: *\nAllow: /`);
+
+        nock(DOMAIN).get('/first').reply(200, 'OK');
+        nock(DOMAIN).get('/second').reply(200, 'OK');
+        nock(DOMAIN).get('/third').reply(200, 'OK');
+
+        await client.get(`${DOMAIN}/first`);
+        await client.get(`${DOMAIN}/second`);
+        await client.get(`${DOMAIN}/third`);
+
+        expect(robotsScope.isDone()).toBe(true);
+    });
+
+    test(`
+    GIVEN a requestCount caching policy of 2 requests
+    WHEN a second request is made
+    THEN robots.txt should NOT be fetched again
+    `, async () => {
+        const initialTime = 1672531200000;
+        jest.spyOn(Date, 'now').mockReturnValue(initialTime);
+
+        client = axios.create();
+        applyRobotsInterceptor(client, {
+            userAgent: USER_AGENT,
+            cachingPolicy: {
+                type: CachingPolicyType.RequestCount,
+                maxRequests: 2
+            }
+        });
+
+        const robotsScope = nock(DOMAIN)
+            .get('/robots.txt')
+            .times(1)
+            .reply(200, `User-agent: *\nAllow: /`);
+
+        nock(DOMAIN).get('/first').reply(200, 'OK');
+        nock(DOMAIN).get('/second').reply(200, 'OK');
+
+        await client.get(`${DOMAIN}/first`);
+        await client.get(`${DOMAIN}/second`);
+
+        expect(robotsScope.isDone()).toBe(true);
+    });
 });

@@ -1,25 +1,31 @@
 import { RobotsDataRepository } from '../../../../src/data/repositories/RobotsDataRepository';
 import { RobotsPluginOptions } from '../../../../src/domain/models/RobotsPluginOptions';
-import { CachingPolicyType } from '../../../../src/domain/models/CachingPolicyType';
+import { CachingStrategyFactory } from '../../../../src/domain/strategies/caching/CachingStrategyFactory';
 import axios from 'axios';
 import robotsParser from 'robots-parser';
+import { HEADER_USER_AGENT } from '../../../../src/constants';
 
 jest.mock('axios');
 jest.mock('robots-parser');
+jest.mock('../../../../src/domain/strategies/caching/CachingStrategyFactory');
 
 const mockAxios = axios as unknown as jest.Mocked<typeof axios>;
 const mockRobotsParser = robotsParser as unknown as jest.MockedFunction<typeof robotsParser>;
+const mockStrategyFactory = CachingStrategyFactory as unknown as jest.MockedClass<typeof CachingStrategyFactory>;
 
 describe('RobotsDataRepository', () => {
     let repository: RobotsDataRepository;
     const origin = 'https://example.com';
     const userAgent = 'test-bot';
+    let mockStrategy: { isValid: jest.Mock; };
 
     beforeEach(() => {
         jest.clearAllMocks();
+
         mockAxios.create.mockReturnValue({
             get: jest.fn().mockResolvedValue({ data: 'User-agent: *\nDisallow: /' })
         } as any);
+
         mockRobotsParser.mockReturnValue({
             isAllowed: jest.fn(),
             isDisallowed: jest.fn(),
@@ -28,72 +34,141 @@ describe('RobotsDataRepository', () => {
             getSitemaps: jest.fn(),
             getPreferredHost: jest.fn(),
         });
+
+        mockStrategy = { isValid: jest.fn() };
+        mockStrategyFactory.prototype.getStrategy = jest.fn().mockReturnValue(mockStrategy);
     });
 
     describe('Caching Behavior', () => {
         test(`
-        GIVEN an indefinite (default) caching policy
-        WHEN robots.txt is requested twice with a long time gap
-        THEN it should only fetch from the network once
+        GIVEN strategy says cache is valid
+        WHEN robots.txt is requested
+        THEN it should NOT fetch from network
         `, async () => {
             repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
-            const future = Date.now() + 100 * 24 * 60 * 60 * 1000;
-
             await repository.getRobot(origin, userAgent);
-            jest.spyOn(Date, 'now').mockReturnValue(future);
+
+            mockStrategy.isValid.mockReturnValue(true);
+
             await repository.getRobot(origin, userAgent);
 
             expect(mockAxios.create).toHaveBeenCalledTimes(1);
+            expect(mockStrategy.isValid).toHaveBeenCalled();
         });
 
         test(`
-        GIVEN an expireAfter caching policy
-        WHEN robots.txt is requested after the expiration duration
-        THEN it should fetch from the network again
+        GIVEN strategy says cache is invalid
+        WHEN robots.txt is requested
+        THEN it should fetch from network again
         `, async () => {
-            const duration = '5m';
-            const durationMs = 5 * 60 * 1000;
-            repository = new RobotsDataRepository({
-                userAgent,
-                cachingPolicy: {
-                    type: CachingPolicyType.ExpireAfter,
-                    duration
-                }
-            } as RobotsPluginOptions);
-            const initialTime = 1000;
-            const expiredTime = initialTime + durationMs + 1;
-            jest.spyOn(Date, 'now').mockReturnValue(initialTime);
-
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
             await repository.getRobot(origin, userAgent);
-            jest.spyOn(Date, 'now').mockReturnValue(expiredTime);
+
+            mockStrategy.isValid.mockReturnValue(false);
+
             await repository.getRobot(origin, userAgent);
 
             expect(mockAxios.create).toHaveBeenCalledTimes(2);
+            expect(mockStrategy.isValid).toHaveBeenCalled();
         });
 
         test(`
-        GIVEN an expireAfter caching policy
-        WHEN robots.txt is requested before the expiration duration
-        THEN it should return the cached data without refetching
+        GIVEN valid cached robot
+        WHEN incrementUsage is called
+        THEN usageCount should be incremented
         `, async () => {
-            const duration = 5 * 60 * 1000;
-            const durationMs = duration;
-            repository = new RobotsDataRepository({
-                userAgent,
-                cachingPolicy: {
-                    type: CachingPolicyType.ExpireAfter,
-                    duration
-                }
-            } as RobotsPluginOptions);
-            const initialTime = 1000;
-            const validTime = initialTime + durationMs - 1;
-            jest.spyOn(Date, 'now').mockReturnValue(initialTime);
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
 
-            await repository.getRobot(origin, userAgent);
-            jest.spyOn(Date, 'now').mockReturnValue(validTime);
-            await repository.getRobot(origin, userAgent);
+            const cached1 = await repository.getRobot(origin, userAgent);
+            expect(cached1.usageCount).toBe(0);
 
-            expect(mockAxios.create).toHaveBeenCalledTimes(1);
+            repository.incrementUsage(origin);
+            expect(cached1.usageCount).toBe(1);
+
+            mockStrategy.isValid.mockReturnValue(true);
+
+            const cached2 = await repository.getRobot(origin, userAgent);
+            expect(cached2).toBe(cached1);
+            expect(cached2.usageCount).toBe(1);
+
+            repository.incrementUsage(origin);
+            expect(cached2.usageCount).toBe(2);
+        });
+
+        test(`
+        GIVEN cached robot updates
+        WHEN cached robot is refreshed
+        THEN usageCount should reset to 0
+        `, async () => {
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
+
+            const cached1 = await repository.getRobot(origin, userAgent);
+            repository.incrementUsage(origin);
+            expect(cached1.usageCount).toBe(1);
+
+            mockStrategy.isValid.mockReturnValue(false);
+
+            const cached2 = await repository.getRobot(origin, userAgent);
+
+            expect(cached2).not.toBe(cached1);
+            expect(cached2.usageCount).toBe(0);
+        });
+
+        test(`
+        GIVEN cached robot exists
+        WHEN getCachedRobot is called
+        THEN it should return the cached robot without validation
+        `, async () => {
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
+
+            const cached1 = await repository.getRobot(origin, userAgent);
+
+            mockStrategy.isValid.mockReturnValue(false);
+
+            const result = repository.getCachedRobot(origin);
+
+            expect(result).toBe(cached1);
+            expect(mockStrategy.isValid).not.toHaveBeenCalled();
+        });
+
+        test(`
+        GIVEN no cached robot
+        WHEN incrementUsage is called
+        THEN it should do nothing
+        `, async () => {
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
+
+            repository.incrementUsage('https://unknown.com');
+
+            expect(repository.getCachedRobot('https://unknown.com')).toBeUndefined();
+        });
+
+        test(`
+        GIVEN no cached robot
+        WHEN setLastCrawled is called
+        THEN it should do nothing
+        `, async () => {
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
+
+            repository.setLastCrawled('https://unknown.com', Date.now());
+
+            expect(repository.getCachedRobot('https://unknown.com')).toBeUndefined();
+        });
+
+        test(`
+        GIVEN no userAgent provided
+        WHEN getRobot is called
+        THEN it should default to wildchar
+        `, async () => {
+            repository = new RobotsDataRepository({ userAgent } as RobotsPluginOptions);
+
+            await repository.getRobot(origin);
+
+            expect(mockAxios.create).toHaveBeenCalledWith(expect.objectContaining({
+                headers: expect.objectContaining({
+                    [HEADER_USER_AGENT]: '*'
+                })
+            }));
         });
     });
 });

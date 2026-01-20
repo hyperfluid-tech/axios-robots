@@ -13,6 +13,18 @@ export interface IRobotsDataRepository {
     getRobot(url: string, userAgent?: string): Promise<CachedRobot>;
 
     /**
+     * Retrieves the robot from cache if available, without fetching or validating against strategy.
+     * @param url The URL to retrieve the robot for.
+     */
+    getCachedRobot(url: string): CachedRobot | undefined;
+
+    /**
+     * Increments the usage count for the cached robot associated with the URL.
+     * @param url The URL identifying the domain.
+     */
+    incrementUsage(url: string): void;
+
+    /**
      * Updates the last crawled timestamp for the domain associated with the URL.
      * @param url The URL identifying the domain.
      * @param timestamp The timestamp to set.

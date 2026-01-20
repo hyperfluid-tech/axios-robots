@@ -110,6 +110,12 @@ const timeBased = {
     type: CachingPolicyType.ExpireAfter,
     duration: '1h' // Supports strings ('5m', '1d', '200ms') or numbers (milliseconds)
 };
+
+// Option 3: Request-based Expiration
+const requestBased = {
+    type: CachingPolicyType.RequestCount,
+    maxRequests: 10 // Expire after 10 requests
+};
 ```
 
 ### Error Handling

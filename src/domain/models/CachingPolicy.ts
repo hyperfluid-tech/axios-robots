@@ -1,6 +1,6 @@
 import { CachingPolicyType } from './CachingPolicyType';
 
-export type CachingPolicy = IndefiniteCachingPolicy | ExpireAfterCachingPolicy;
+export type CachingPolicy = IndefiniteCachingPolicy | ExpireAfterCachingPolicy | RequestCountCachingPolicy;
 
 export interface IndefiniteCachingPolicy {
     type: CachingPolicyType.Indefinite;
@@ -13,3 +13,12 @@ export interface ExpireAfterCachingPolicy {
      */
     duration: string | number;
 }
+
+export interface RequestCountCachingPolicy {
+    type: CachingPolicyType.RequestCount;
+    /**
+     * Maximum number of requests before the cache expires.
+     */
+    maxRequests: number;
+}
+

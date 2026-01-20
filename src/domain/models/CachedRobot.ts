@@ -13,4 +13,8 @@ export interface CachedRobot {
      * Timestamp of when the robots.txt was fetched.
      */
     fetchedAt: number;
+    /**
+     * Number of times this cached robot has been accessed.
+     */
+    usageCount?: number;
 }

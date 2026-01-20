@@ -39,7 +39,7 @@ export class RobotsInterceptor {
    * Intercepts Axios requests to enforce the Robots Exclusion Protocol.
    */
   public async intercept(config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> {
-    if (!config.url) {
+    if (!config.url && !config.baseURL) {
       return config;
     }
 
@@ -108,7 +108,7 @@ export class RobotsInterceptor {
         return new URL(config.url || '', config.baseURL);
       }
 
-      return new URL(config.url || '');
+      return new URL(config.url as string);
     } catch (e: any) {
       throw new InvalidUrlError(e.message);
     }

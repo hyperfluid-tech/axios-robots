@@ -182,6 +182,76 @@ THEN it should send the configured User-Agent header
 
             expect(response.status).toBe(200);
         });
+
+        test(`
+        GIVEN a baseURL and a relative URL
+        WHEN a request is made
+        THEN it should resolve the full URL correctly
+        `, async () => {
+            nock(DOMAIN)
+                .get('/robots.txt')
+                .reply(200, `User-agent: *\nAllow: /relative`);
+
+            nock(DOMAIN)
+                .get('/relative')
+                .reply(200, 'OK');
+
+            client.defaults.baseURL = DOMAIN;
+            const response = await client.get('/relative');
+
+            expect(response.status).toBe(200);
+        });
+
+        test(`
+        GIVEN a request with no URL
+        WHEN the interceptor runs
+        THEN it should return the config as-is
+        `, async () => {
+            const interceptor = (client.interceptors.request as any).handlers[0].fulfilled;
+            const config = { headers: {} };
+            const result = await interceptor(config);
+            expect(result).toBe(config);
+        });
+
+        test(`
+        GIVEN a response with no config
+        WHEN the response interceptor runs
+        THEN it should return the response as-is
+        `, () => {
+            const interceptor = (client.interceptors.response as any).handlers[0].fulfilled;
+            const response = { data: 'ok' };
+            const result = interceptor(response);
+            expect(result).toBe(response);
+        });
+
+        test(`
+        GIVEN a config with no headers
+        WHEN the interceptor runs
+        THEN it should not throw and should proceed
+        `, async () => {
+            const interceptor = (client.interceptors.request as any).handlers[0].fulfilled;
+            const config = { url: 'https://example.com' }; // No headers
+            const result = await interceptor(config);
+            // Should not set header, but return config
+            expect(result).toBe(config);
+            expect(config).not.toHaveProperty('headers');
+        });
+
+        test(`
+        GIVEN a baseURL and an empty URL
+        WHEN a request is made
+        THEN it should resolve using just the baseURL
+        `, async () => {
+            const interceptor = (client.interceptors.request as any).handlers[0].fulfilled;
+            const config = { baseURL: DOMAIN, url: '' };
+
+            // Setup mock for the robots.txt request that the interceptor will trigger
+            const scope = nock(DOMAIN).get('/robots.txt').reply(200, 'User-agent: *\nAllow: /');
+
+            await interceptor(config);
+
+            expect(scope.isDone()).toBe(true);
+        });
     });
 
     describe('Caching', () => {
