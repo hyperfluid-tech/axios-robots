@@ -1,9 +1,9 @@
-import { CrawlDelayStrategyFactory } from '../../../../src/domain/strategies/CrawlDelayStrategyFactory';
-import { AwaitCrawlDelayStrategy } from '../../../../src/domain/strategies/AwaitCrawlDelayStrategy';
-import { FailureCrawlDelayStrategy } from '../../../../src/domain/strategies/FailureCrawlDelayStrategy';
-import { IgnoreCrawlDelayStrategy } from '../../../../src/domain/strategies/IgnoreCrawlDelayStrategy';
-import { CrawlDelayComplianceMode } from '../../../../src/domain/models/CrawlDelayComplianceMode';
-import { CalculateWaitTimeUseCase } from '../../../../src/domain/usecases/CalculateWaitTimeUseCase';
+import { CrawlDelayComplianceMode } from "../../../../../src";
+import { AwaitCrawlDelayStrategy } from "../../../../../src/domain/strategies/crawl-delay/AwaitCrawlDelayStrategy";
+import { CrawlDelayStrategyFactory } from "../../../../../src/domain/strategies/crawl-delay/CrawlDelayStrategyFactory";
+import { FailureCrawlDelayStrategy } from "../../../../../src/domain/strategies/crawl-delay/FailureCrawlDelayStrategy";
+import { IgnoreCrawlDelayStrategy } from "../../../../../src/domain/strategies/crawl-delay/IgnoreCrawlDelayStrategy";
+import { CalculateWaitTimeUseCase } from "../../../../../src/domain/usecases/CalculateWaitTimeUseCase";
 
 describe('CrawlDelayStrategyFactory', () => {
     let factory: CrawlDelayStrategyFactory;

@@ -1,4 +1,4 @@
-import { CachedRobot } from '../models/CachedRobot';
+import { CachedRobot } from '../../models/CachedRobot';
 
 /**
  * Strategy interface for validating cached robots.txt data.

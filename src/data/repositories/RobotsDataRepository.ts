@@ -6,7 +6,7 @@ import { IRobotsDataRepository } from '../../domain/interfaces/IRobotsDataReposi
 import { CachedRobot } from '../../domain/models/CachedRobot';
 import { RobotsPluginOptions } from '../../domain/models/RobotsPluginOptions';
 import { CachingPolicy } from '../../domain/models/CachingPolicy';
-import { CachingStrategyFactory } from '../../domain/strategies/CachingStrategyFactory';
+import { CachingStrategyFactory } from '../../domain/strategies/caching/CachingStrategyFactory';
 import { CachingPolicyType } from '../../domain/models/CachingPolicyType';
 
 export class RobotsDataRepository implements IRobotsDataRepository {

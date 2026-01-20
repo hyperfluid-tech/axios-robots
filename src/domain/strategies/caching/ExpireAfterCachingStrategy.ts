@@ -1,6 +1,6 @@
 import ms from 'ms';
 import { ICachingStrategy } from './ICachingStrategy';
-import { CachedRobot } from '../models/CachedRobot';
+import { CachedRobot } from '../../models/CachedRobot';
 
 export class ExpireAfterCachingStrategy implements ICachingStrategy {
     private durationMs: number;

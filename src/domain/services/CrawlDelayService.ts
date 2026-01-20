@@ -2,7 +2,7 @@ import { CrawlDelayComplianceMode } from '../models/CrawlDelayComplianceMode';
 import { ICrawlDelayService } from '../interfaces/ICrawlDelayService';
 import { IRobotsDataRepository } from '../interfaces/IRobotsDataRepository';
 import { CalculateWaitTimeUseCase } from '../usecases/CalculateWaitTimeUseCase';
-import { CrawlDelayStrategyFactory } from '../strategies/CrawlDelayStrategyFactory';
+import { CrawlDelayStrategyFactory } from '../strategies/crawl-delay/CrawlDelayStrategyFactory';
 
 export class CrawlDelayService implements ICrawlDelayService {
     private calculateWaitTimeUseCase: CalculateWaitTimeUseCase;

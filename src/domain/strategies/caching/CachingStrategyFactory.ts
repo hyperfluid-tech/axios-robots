@@ -1,5 +1,5 @@
-import { CachingPolicy } from '../models/CachingPolicy';
-import { CachingPolicyType } from '../models/CachingPolicyType';
+import { CachingPolicy } from '../../models/CachingPolicy';
+import { CachingPolicyType } from '../../models/CachingPolicyType';
 import { ICachingStrategy } from './ICachingStrategy';
 import { IndefiniteCachingStrategy } from './IndefiniteCachingStrategy';
 import { ExpireAfterCachingStrategy } from './ExpireAfterCachingStrategy';

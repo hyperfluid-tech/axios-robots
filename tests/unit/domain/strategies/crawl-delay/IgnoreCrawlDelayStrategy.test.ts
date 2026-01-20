@@ -1,4 +1,4 @@
-import { IgnoreCrawlDelayStrategy } from '../../../../src/domain/strategies/IgnoreCrawlDelayStrategy';
+import { IgnoreCrawlDelayStrategy } from "../../../../../src/domain/strategies/crawl-delay/IgnoreCrawlDelayStrategy";
 
 describe('IgnoreCrawlDelayStrategy', () => {
     let strategy: IgnoreCrawlDelayStrategy;
