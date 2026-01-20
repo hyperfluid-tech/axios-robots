@@ -19,38 +19,56 @@ export class RobotsDataRepository implements IRobotsDataRepository {
         this.strategyFactory = new CachingStrategyFactory();
     }
 
-    async getRobot(
-        url: string, 
-        userAgent: string = '*', 
-        options: { incrementUsage?: boolean; ignoreCachePolicy?: boolean } = {}
-    ): Promise<CachedRobot> {
-        const { incrementUsage = true, ignoreCachePolicy = false } = options;
+    async getRobot(url: string, userAgent: string = '*'): Promise<CachedRobot> {
         const origin = new URL(url).origin;
         let cached = this.cache.get(origin);
 
         const strategy = this.strategyFactory.getStrategy(this.cachingPolicy);
-        const isValid = cached && (ignoreCachePolicy || strategy.isValid(cached));
+        const isValid = cached && strategy.isValid(cached);
 
-        if (isValid && cached) {
-            if (incrementUsage) {
-                cached.usageCount = (cached.usageCount || 0) + 1;
-            }
+        if (cached && isValid) {
             return cached;
         }
 
         const robot = await this.fetchRobotsTxt(origin, userAgent);
-        cached = { robot, fetchedAt: Date.now(), usageCount: 1 };
+        const previousLastCrawled = cached?.lastCrawled;
+
+        cached = {
+            robot,
+            fetchedAt: Date.now(),
+            usageCount: 0
+        };
+
+        if (previousLastCrawled) {
+            cached.lastCrawled = previousLastCrawled;
+        }
+
         this.cache.set(origin, cached);
 
         return cached;
     }
 
+    getCachedRobot(url: string): CachedRobot | undefined {
+        const origin = new URL(url).origin;
+        return this.cache.get(origin);
+    }
+
+    incrementUsage(url: string): void {
+        const origin = new URL(url).origin;
+        const cached = this.cache.get(origin);
+        if (!cached) {
+            return;
+        }
+        cached.usageCount = (cached.usageCount || 0) + 1;
+    }
+
     setLastCrawled(url: string, timestamp: number): void {
         const origin = new URL(url).origin;
         const cached = this.cache.get(origin);
-        if (cached) {
-            cached.lastCrawled = timestamp;
+        if (!cached) {
+            return;
         }
+        cached.lastCrawled = timestamp;
     }
 
     private async fetchRobotsTxt(origin: string, userAgent: string): Promise<Robot> {
