@@ -14,8 +14,6 @@ export class CachingStrategyFactory {
                 return new ExpireAfterCachingStrategy(policy.duration);
             case CachingPolicyType.RequestCount:
                 return new RequestCountCachingStrategy(policy.maxRequests);
-            default:
-                return new IndefiniteCachingStrategy();
         }
     }
 }
